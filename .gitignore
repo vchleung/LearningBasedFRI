@@ -159,6 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-FRIED-Net/test/
-FRIED-Net/results/
-dataset/
+/FRIED-Net/test/
+/FRIED-Net/results/
+/dataset/
+/FRIED-Net/pretrained_models_original/

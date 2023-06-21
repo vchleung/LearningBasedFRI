@@ -1,7 +1,9 @@
 ## FRI Encoder-Decoder Network (FRIED-Net)
 An encoder-decoder network inspired by modelling the acquisition process of FRI signals as it can be perfectly defined by a small number of parameters. We demonstrate the common case of reconstructing a stream of Diracs/pulses, which is completely defined by its locations (latent code of the encoder-decoder network) and amplitudes (obtained through least squares fitting).
 
-<img src="../figures/FRIED-Net.png" width="70%">
+<p align="center">
+    <img src="../figures/FRIED-Net.png" width="70%">
+</p>
 
 ## Data
 Data is in `.h5` format and must at least contain the noisy samples as `y_n_noisy` and the ground truth locations `t_k`. 
