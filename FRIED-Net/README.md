@@ -44,7 +44,7 @@ python main.py \
     --model_decoder decoderReLUNet --decoder_init_filename path/to/learnedPhiModel.pth --train_decoder --norm_phi \
     --loss_fn ynnoisyMSE+tkMSE --loss_prms 100.
 ```
-There are also other different settings to be played with. For example, to apply FRIED-Net to Calcium imaging data (non-periodic signal), arguments `--no-periodic` and `--samp_mode causal` has to be set. Please kindly refer to the description of the arguments in the code for a more detailed explanation to each parameter.
+There are also other different settings to be played with. For example, to apply FRIED-Net to Calcium imaging data (non-periodic signal), arguments `--no-periodic` and `--samp_mode causal` has to be set. Please refer to the description of the arguments in the code for a more detailed explanation to each parameter.
 
 ## Testing
 To test the trained model, run [`test.py`](test.py):

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import layers_encoder
 import layers_decoder
-import utils
+import utils_model
 
 
 def batch_lstsq(phi, y_n, t_k, tstart=-0.5, tend=0.5):
@@ -25,7 +25,7 @@ def estimate_a_k(true_ak, periodic, N, T, test):
         return lambda _, y_n_hat, phi_hat, __: \
             torch.linalg.lstsq(phi_hat.squeeze(), y_n_hat.squeeze().unsqueeze(-1)).solution
     else: # Need to remove effect of the tks that is not in range --> do least squares differently
-        n_vec = utils.nVec(N)
+        n_vec = utils_model.nVec(N)
         tstart, tend = n_vec[0]*T, (n_vec[-1]+1)*T
         return lambda _, y_n_hat, phi_hat, t_k_hat: batch_lstsq(phi_hat, y_n_hat, t_k_hat, tstart, tend)  #detach phi, y for faster computation
 
@@ -43,10 +43,9 @@ class FRIEDNet(nn.Module):
         if prms['model_decoder']:
             decoderNet = getattr(layers_decoder, prms['model_decoder'])
             self.decoder = decoderNet(prms).to(prms['device'])
+            self.estimate_a_k = estimate_a_k(prms['true_ak'], prms['periodic'], prms['N'], prms['T'], test)
         else:
             self.decoder = None
-
-        self.estimate_a_k = estimate_a_k(prms['true_ak'], prms['periodic'], prms['N'], prms['T'], test)
 
     def forward(self, y_noisy, a_k_hat, t_k_init):
         if self.encoder:

@@ -10,8 +10,9 @@ from torch.utils.data import DataLoader, TensorDataset
 import json
 
 # Our own codes
-import utils_data
 import utils
+import utils_data
+import utils_model
 import loss
 import phis
 from model import FRIEDNet
@@ -92,7 +93,7 @@ else:
 
     model = FRIEDNet(prms).to(prms['device'])
 
-    optimizer, lr_scheduler = utils.set_optimizer_scheduler(model, prms)
+    optimizer, lr_scheduler = utils_model.set_optimizer_scheduler(model, prms)
 
     print("=> no checkpoint found at '{}'".format(checkpoint_path))
     # Initialise model from given file path
@@ -176,16 +177,16 @@ model.train()  # Ready for training
 
 # Freeze encoder/decoder depending on settings
 if not prms['train_encoder'] and model.encoder:
-    utils.freeze_layers(model.encoder)
+    utils_model.freeze_layers(model.encoder)
     print('Encoder Frozen...')
 
 if not prms['train_decoder'] and model.decoder:
-    utils.freeze_layers(model.decoder)
+    utils_model.freeze_layers(model.decoder)
     print('Decoder Frozen...')
 
 # Print the training parameters into a text file
 with open(pjoin(prms['output_dir'], 'train_param.txt'), "w") as f:
-    for k, v in prms.items():
+    for k, v in sorted(prms.items()):
         f.write("{}: {}\n".format(k, v))
 
 if not os.path.exists(pjoin(prms['output_dir'], 'results.txt')):
@@ -228,7 +229,7 @@ for epoch in range(startEpoch + 1, prms['num_epochs'] + 1):
 
         if prms['awgn_epoch']:
             a_kmax_batch = batch[2].to(prms['device'])
-            y_n_noisy, _ = utils.awgn_psnr(y_n, a_kmax_batch, psnr_range=prms['awgn_epoch_prms'], dist=prms['awgn_epoch_dist'])
+            y_n_noisy, _ = utils_model.awgn_psnr(y_n, a_kmax_batch, psnr_range=prms['awgn_epoch_prms'], dist=prms['awgn_epoch_dist'])
         else:
             y_n_noisy = batch[0].to(prms['device'])
 

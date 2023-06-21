@@ -11,6 +11,7 @@ import argparse
 
 import utils
 import utils_data
+import utils_model
 import loss
 
 # Set printing options
@@ -52,7 +53,7 @@ for i, file in enumerate(args.data_filename):
 
     if args.fine_tune:
         model.train()
-        utils.freeze_layers(model.decoder)      # Only train the encoder
+        utils_model.freeze_layers(model.decoder)      # Only train the encoder
     else:
         model.eval()
 
@@ -120,7 +121,7 @@ for i, file in enumerate(args.data_filename):
 
         pbar.close()
 
-        utils.wrap_tk(t_k_est, prms['N'], prms['T'])     # Fix t_k back to principal range
+        utils_model.wrap_tk(t_k_est, prms['N'], prms['T'])     # Fix t_k back to principal range
         t_k_est, _ = torch.sort(t_k_est, dim=-1)         # sort t_k
         print('Location wrapped and sorted')
 

@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import copy
 import phis
-import utils
+import utils_model
 
 
 def periodicSamp(periodic_samp, N):
@@ -124,7 +124,7 @@ class decoderReLUNet(nn.Module):
 
         self.periodicSamp = periodicSamp(prms['periodic'], self.N)
 
-        self.n_vec = utils.nVec(self.N).to(self.device)
+        self.n_vec = utils_model.nVec(self.N).to(self.device)
 
         self.c_ReLU = nn.ParameterList()
         self.shift = nn.ParameterList()
@@ -156,7 +156,7 @@ class decoderReLUNet(nn.Module):
         self.layers = nn.Sequential(*layersList)
 
         self.init_decoder_weights()
-        utils.freeze_layers(self.layers)
+        utils_model.freeze_layers(self.layers)
 
     def init_decoder_weights(self):
         """ initialise the parameters for neural network """
@@ -170,8 +170,8 @@ class decoderReLUNet(nn.Module):
 
         layer2bias = torch.cat(y, 0).float().to(self.device)
 
-        utils.setParamValue(self.layers[0].weight, layer2weight)
-        utils.setParamValue(self.layers[0].bias, layer2bias)
+        utils_model.setParamValue(self.layers[0].weight, layer2weight)
+        utils_model.setParamValue(self.layers[0].bias, layer2bias)
 
     def forward(self, t_k_hat):
 
@@ -223,7 +223,7 @@ class decoderTriNet(nn.Module):
 
         self.periodicSamp = periodicSamp(prms['periodic'], self.N)
 
-        self.n_vec = utils.nVec(self.N).to(self.device)
+        self.n_vec = utils_model.nVec(self.N).to(self.device)
 
         self.c_tri = nn.ParameterList()
         self.shift = nn.ParameterList()
@@ -262,7 +262,7 @@ class decoderTriNet(nn.Module):
         self.layers = nn.Sequential(*layersList)
 
         self.init_decoder_weights()
-        utils.freeze_layers(self.layers)
+        utils_model.freeze_layers(self.layers)
 
     def init_decoder_weights(self):
         x = []
@@ -274,12 +274,12 @@ class decoderTriNet(nn.Module):
         layer2weight = torch.block_diag(*x).t().type(self.dtype).to(self.device)
         layer2bias = torch.cat(y, 0).type(self.dtype).to(self.device)
 
-        utils.setParamValue(self.layers[0].weight, layer2weight)
-        utils.setParamValue(self.layers[0].bias, layer2bias)
+        utils_model.setParamValue(self.layers[0].weight, layer2weight)
+        utils_model.setParamValue(self.layers[0].bias, layer2bias)
 
         layer3weight = torch.tensor([1., -2., 1.], dtype=self.dtype, requires_grad=False).repeat(self.N, 1, 1).to(self.device) # Triangular function in terms of ReLU
 
-        utils.setParamValue(self.layers[2].weight, layer3weight)
+        utils_model.setParamValue(self.layers[2].weight, layer3weight)
 
     def forward(self, t_k_hat):
 
