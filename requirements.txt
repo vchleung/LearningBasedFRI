@@ -1,7 +1,6 @@
 h5py
 matplotlib
 numpy
-scikit_learn
 scipy
 tqdm
 visdom

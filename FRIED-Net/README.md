@@ -26,7 +26,7 @@ Below trains a full FRIED-Net with encoder initialised from the pretrained direc
 ```shell
 python main.py \
     --output_dir path/to/output/ --data_dir path/to/data/ --N 21 --K 2 \
-    --model_encoder conv --encoder_init_filename path/to/directInferenceModel.pth \
+    --model_encoder conv --encoder_init_path path/to/directInferenceModel.pth \
     --model_decoder decoderReLUNet --init_phi eMOMS --init_phi_prms 20 --true_ak \
     --loss_fn ynMSE+tkMSE --loss_prms 1.
 ```
@@ -34,7 +34,7 @@ When the shape of $\varphi$(t)$ is unknown and we want to learn the decoder
 ```shell
 python main.py \
     --output_dir path/to/output/ --data_dir path/to/data/ --N 21 --K 2 \
-    --model_encoder conv --encoder_init_filename path/to/directInferenceModel.pth --no-train_encoder \
+    --model_encoder conv --encoder_init_path path/to/directInferenceModel.pth --no-train_encoder \
     --model_decoder decoderReLUNet --train_decoder --norm_phi \
     --loss_fn ynnoisyMSE 
 ```
@@ -42,8 +42,8 @@ Finally, when you want to initialise from the learned encoder and learned decode
 ```shell
 python main.py \
     --output_dir path/to/output/ --data_dir path/to/data/ --N 21 --K 2 \
-    --model_encoder conv --encoder_init_filename path/to/directInferenceModel.pth --train_encoder \
-    --model_decoder decoderReLUNet --decoder_init_filename path/to/learnedPhiModel.pth --train_decoder --norm_phi \
+    --model_encoder conv --encoder_init_path path/to/directInferenceModel.pth --train_encoder \
+    --model_decoder decoderReLUNet --decoder_init_path path/to/learnedPhiModel.pth --train_decoder --norm_phi \
     --loss_fn ynnoisyMSE+tkMSE --loss_prms 100.
 ```
 There are also other different settings to be played with. For example, to apply FRIED-Net to Calcium imaging data (non-periodic signal), arguments `--no-periodic` and `--samp_mode causal` has to be set. Please refer to the description of the arguments in the code for a more detailed explanation to each parameter.

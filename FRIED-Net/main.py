@@ -24,8 +24,8 @@ parser.add_argument('--output_dir', type=str, default='./Model/experiment_name/'
 parser.add_argument('--data_dir', type=str, default='./dataset/dataset_dir/', help='data directory')
 parser.add_argument('--train_filename', type=str, default="train.h5", help='train data file')
 parser.add_argument('--test_filename', type=str, default="test.h5", help='test data file')
-parser.add_argument("--encoder_init_filename", type=str, default=None, help="path to encoder initialisation (only model parameters, not other parameters different from checkpoint)")
-parser.add_argument("--decoder_init_filename", type=str, default=None, help="path to decoder initialisation (only model parameters, not other parameters different from checkpoint)")
+parser.add_argument("--encoder_init_path", type=str, default=None, help="path to encoder initialisation (only model parameters, not other parameters different from checkpoint)")
+parser.add_argument("--decoder_init_path", type=str, default=None, help="path to decoder initialisation (only model parameters, not other parameters different from checkpoint)")
 # Simulation
 parser.add_argument('--lr_encoder', type=float, default=1e-4, help='Learning Rate for the encoder')
 parser.add_argument('--lr_decoder', type=float, default=1e-5, help='Learning Rate for the decoder (kernel coefficients)')
@@ -97,12 +97,12 @@ else:
 
     print("=> no checkpoint found at '{}'".format(checkpoint_path))
     # Initialise model from given file path
-    if prms['encoder_init_filename']:
-        utils.load(prms['encoder_init_filename'], model, init="encoder")
+    if prms['encoder_init_path']:
+        utils.load(prms['encoder_init_path'], model, init="encoder")
         print("Encoder Initialised")
 
-    if prms['decoder_init_filename']:
-        utils.load(prms['decoder_init_filename'], model, init="decoder")
+    if prms['decoder_init_path']:
+        utils.load(prms['decoder_init_path'], model, init="decoder")
         print("Decoder Initialised")
 
     startEpoch = 0
@@ -141,16 +141,26 @@ test_t_k = utils_data.read_t_k(prms['data_dir'], test_filename)
 num_train_data = train_y_n_noisy.shape[0]
 num_test_data = test_y_n_noisy.shape[0]
 
+if train_y_n is not None:
+    train_y_n = torch.empty(num_train_data)
+
+if test_y_n is not None:
+    test_y_n = torch.empty(num_test_data)
+
 print("Training Data / Test Data: ", num_train_data, num_test_data)
 
-train_a_k = utils_data.read_a_k(prms['data_dir'], train_filename)
-train_a_kmax = np.max(np.abs(train_a_k), axis=1) # For calculating PSNR per epoch
-
 if prms['true_ak']:
+    train_a_k = utils_data.read_a_k(prms['data_dir'], train_filename)
     test_a_k = utils_data.read_a_k(prms['data_dir'], test_filename)
 else:
-    train_a_k = torch.empty(num_train_data, prms['K_total'])
-    test_a_k = torch.empty(num_test_data, prms['K_total'])
+    train_a_k = torch.empty(num_train_data)
+    test_a_k = torch.empty(num_test_data)
+
+if prms['awgn_epoch']:
+    tmp = utils_data.read_a_k(prms['data_dir'], train_filename)
+    train_a_kmax = np.max(np.abs(tmp), axis=1)      # For calculating PSNR per epoch
+else:
+    train_a_kmax = torch.empty(num_train_data)
 
 # Make output directory
 viz_name = os.path.split(prms['output_dir'])[-1]
@@ -158,14 +168,15 @@ viz_name = os.path.split(prms['output_dir'])[-1]
 if not os.path.exists(prms['output_dir']):
     os.makedirs(prms['output_dir'])
 
-train_set = TensorDataset(torch.from_numpy(train_y_n_noisy).type(prms['dtype']).cuda(prms['device']),
+
+train_set = TensorDataset(torch.Tensor(train_y_n_noisy).type(prms['dtype']).cuda(prms['device']),
                           torch.Tensor(train_a_k).type(prms['dtype']).cuda(prms['device']),
                           torch.Tensor(train_a_kmax).type(prms['dtype']).cuda(prms['device']),
-                          torch.from_numpy(train_y_n).type(prms['dtype']).cuda(prms['device']),
+                          torch.Tensor(train_y_n).type(prms['dtype']).cuda(prms['device']),
                           torch.Tensor(train_t_k).type(prms['dtype']).cuda(prms['device']))
-test_set = TensorDataset(torch.from_numpy(test_y_n_noisy).type(prms['dtype']).cuda(prms['device']),
+test_set = TensorDataset(torch.Tensor(test_y_n_noisy).type(prms['dtype']).cuda(prms['device']),
                          torch.Tensor(test_a_k).type(prms['dtype']).cuda(prms['device']),
-                         torch.from_numpy(test_y_n).type(prms['dtype']).cuda(prms['device']),
+                         torch.Tensor(test_y_n).type(prms['dtype']).cuda(prms['device']),
                          torch.Tensor(test_t_k).type(prms['dtype']).cuda(prms['device']))
 
 training_data_loader = DataLoader(train_set, batch_size=prms['batch_size'], shuffle=True)
@@ -209,7 +220,7 @@ for epoch in range(startEpoch + 1, prms['num_epochs'] + 1):
         t_phi = utils.Pack_Matrices_with_NaN(t_phi).T.squeeze()
         phi = utils.Pack_Matrices_with_NaN(phi).T.squeeze()
 
-        kernelPlotOpts = dict(xlabel='t',title='Phi', caption='Epoch {}'.format(epoch - 1),
+        kernelPlotOpts = dict(xlabel='t',title='Phi(t/T)', caption='Epoch {}'.format(epoch - 1),
             legend=["Epoch {}, Phi_{:d}(t)".format(epoch - 1, i) for i in range(len(prms['K']))])
         if epoch == startEpoch + 1:
             kernelPlot = viz.line(X=t_phi, Y=phi, env=viz_name, opts=kernelPlotOpts)

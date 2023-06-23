@@ -61,7 +61,7 @@ def awgn_psnr(y, a_kmax, psnr_range, dist):
 
 
 def nVec(N):
-    """ Returns the time interval that we consider [n1*T, n2*T] """
+    """ Returns the time interval that we consider [n1*T, (n2+1)*T) """
     if N % 2 == 0:
         n1 = -N / 2
         n2 = N / 2

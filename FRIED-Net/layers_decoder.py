@@ -34,7 +34,7 @@ def phiInit(init_phi, resolution, N, init_prms, samp_mode):
     if not init_phi:
         t_phi = np.arange(0, N, 1 / resolution)
         phi = np.zeros_like(t_phi)
-    elif init_phi == "uniform": #random value
+    elif init_phi == "uniform":     #random value
         t_phi = np.arange(0, N, 1 / resolution)
         phi = np.random.uniform(-0.01, 0.01, size=t_phi.shape)
     elif "load" in init_phi:
@@ -45,7 +45,6 @@ def phiInit(init_phi, resolution, N, init_prms, samp_mode):
             t_phi, phi = phi_fn(resolution, *init_prms)
         else:
             t_phi, phi = phi_fn(resolution, init_prms)
-
 
     if samp_mode == "symmetric":
         t_mid = (t_phi[-1] - t_phi[0]) / 2

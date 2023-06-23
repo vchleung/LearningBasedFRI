@@ -23,6 +23,8 @@ Please refer to [`FRIED-Net`](FRIED-Net) for the implementation and pretrained m
 ## Dataset
 MATLAB codes related to the dataset are also provided. 
 
+We have also provided the calcium imaging related MATLAB code under [`datasets/cai-1`](datasets/cai-1), where you can convert the cai-1 dataset into the FRI settings used by FRIED-Net, as well as plotting the reconstruction results. Please download the original cai-1 dataset [here](https://crcns.org/data-sets/methods/cai-1) before running the code. Moreover, we have provided the code for running fast deconvolution based on [PyFNND](https://github.com/alimuldal/PyFNND) for performance comparison. Our pretrained FRIED-Net models can be found in [`FRIED-Net/pretrained_models`](FRIED-Net/pretrained_models)
+
 ## Reference
 If you find this repository, please cite the following paper
 
