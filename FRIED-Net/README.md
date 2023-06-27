@@ -1,4 +1,4 @@
-## FRI Encoder-Decoder Network (FRIED-Net)
+# FRI Encoder-Decoder Network (FRIED-Net)
 An encoder-decoder network inspired by modelling the acquisition process of FRI signals as it can be perfectly defined by a small number of parameters. We demonstrate the common case of reconstructing a stream of Diracs/pulses, which is completely defined by its locations (latent code of the encoder-decoder network) and amplitudes (obtained through least squares fitting).
 
 <p align="center">
@@ -30,7 +30,7 @@ python main.py \
     --model_decoder decoderReLUNet --init_phi eMOMS --init_phi_prms 20 --true_ak \
     --loss_fn ynMSE+tkMSE --loss_prms 1.
 ```
-When the shape of $\varphi$(t)$ is unknown and we want to learn the decoder 
+When the shape of $\varphi(t)$ is unknown and we want to learn the decoder 
 ```shell
 python main.py \
     --output_dir path/to/output/ --data_dir path/to/data/ --N 21 --K 2 \
@@ -57,4 +57,4 @@ python test.py \
     --output_dir path/to/output/ \
     --model_path path/to/model_last.pth
 ```
-To fine-tune the learned encoder using backpropagation of mean squared samples error, set the flag `--fine_tune` and `--batch_size 1`. It is also possible to evaluate multiple datafiles using a single model or evaluate multiple datafile with a specified model for each of them by passing `--data_filename` or `model_path` a list.
+To fine-tune the learned encoder using backpropagation of mean squared samples error, set the flag `--fine_tune` and `--batch_size 1`. It is also possible to evaluate multiple datafiles using a single model or evaluate multiple datafile with a specified model for each of them by passing `--data_filename` or `--model_path` a list. For testing on calcium imaging data, set the flag `--load_cai-mat` and point `--data_filename` to the raw cai-1 recording. 

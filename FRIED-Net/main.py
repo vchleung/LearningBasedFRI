@@ -24,8 +24,8 @@ parser.add_argument('--output_dir', type=str, default='./Model/experiment_name/'
 parser.add_argument('--data_dir', type=str, default='./dataset/dataset_dir/', help='data directory')
 parser.add_argument('--train_filename', type=str, default="train.h5", help='train data file')
 parser.add_argument('--test_filename', type=str, default="test.h5", help='test data file')
-parser.add_argument("--encoder_init_path", type=str, default=None, help="path to encoder initialisation (only model parameters, not other parameters different from checkpoint)")
-parser.add_argument("--decoder_init_path", type=str, default=None, help="path to decoder initialisation (only model parameters, not other parameters different from checkpoint)")
+parser.add_argument("--encoder_path", type=str, default=None, help="path to encoder initialisation (only model parameters, not other parameters different from checkpoint)")
+parser.add_argument("--decoder_path", type=str, default=None, help="path to decoder initialisation (only model parameters, not other parameters different from checkpoint)")
 # Simulation
 parser.add_argument('--lr_encoder', type=float, default=1e-4, help='Learning Rate for the encoder')
 parser.add_argument('--lr_decoder', type=float, default=1e-5, help='Learning Rate for the decoder (kernel coefficients)')
@@ -36,7 +36,7 @@ parser.add_argument('--drop_last', type=bool, default=False, action=argparse.Boo
 parser.add_argument('--batch_size', type=int, default=256, help='Batch size')
 parser.add_argument('--testbatch_size', type=int, default=64, help='testing batch size')
 # Training Setup
-parser.add_argument("--dtype", type=str, default="float32", help="float/double")
+parser.add_argument("--dtype", type=str, default="float32", help="float32/float64")
 parser.add_argument('--cuda', type=bool, default=True, action=argparse.BooleanOptionalAction, help='use cuda?')
 parser.add_argument("--savestep", type=int, default=50, help="Sets saving step of model parameters")
 parser.add_argument("--step", type=int, default=200,  help="Sets the learning rate to decay by 10 times every n epochs")
@@ -73,6 +73,11 @@ if not prms_in['T']:
 if not isinstance(prms_in['init_phi_prms'], list):
     prms_in['init_phi_prms'] = [prms_in['init_phi_prms']]
 
+TORCH_DTYPES = {
+    'float32': torch.float,
+    'float64': torch.float64
+}
+
 # Firstly check if there's an unfinished training (checkpoint)
 checkpoint_path = pjoin(prms_in['output_dir'], "model_last.pth")
 if os.path.exists(checkpoint_path):
@@ -82,14 +87,22 @@ if os.path.exists(checkpoint_path):
     prms['device'] = torch.device("cuda") if prms_in['cuda'] else torch.device("cpu")
     prms['num_epochs'] = prms_in['num_epochs']
     prms['output_dir'] = prms_in['output_dir']
+    if prms_in['data_dir']:
+        prms['data_dir'] = prms_in['data_dir']
+        prms['train_filename'] = prms_in['train_filename']
+        prms['test_filename'] = prms_in['test_filename']
+    else:
+        print('Using path to data files specified previously')
 
-    model = FRIEDNet(prms).to(prms['device'])
+    model = model.to(prms['device'])
 
     print("=> loaded checkpoint '{} (iter {})'".format(checkpoint_path, startEpoch))
 else:
     prms = prms_in
     prms['K_total'] = sum(prms['K'])
     prms['device'] = torch.device("cuda") if prms_in['cuda'] else torch.device("cpu")
+    if isinstance(prms['dtype'], str):
+        prms['dtype'] = TORCH_DTYPES[prms['dtype']]
 
     model = FRIEDNet(prms).to(prms['device'])
 
@@ -97,12 +110,12 @@ else:
 
     print("=> no checkpoint found at '{}'".format(checkpoint_path))
     # Initialise model from given file path
-    if prms['encoder_init_path']:
-        utils.load(prms['encoder_init_path'], model, init="encoder")
+    if prms['encoder_path']:
+        utils.load(prms['encoder_path'], model, init="encoder")
         print("Encoder Initialised")
 
-    if prms['decoder_init_path']:
-        utils.load(prms['decoder_init_path'], model, init="decoder")
+    if prms['decoder_path']:
+        utils.load(prms['decoder_path'], model, init="decoder")
         print("Decoder Initialised")
 
     startEpoch = 0
@@ -116,14 +129,7 @@ print("Sampling settings: Number of samples N={:d}, Sampling period T={:.4g}, to
 
 loss_fn = loss.loss_sel(prms['loss_fn'], prms['loss_prms'], reduce='mean')   # Select the loss function
 
-TORCH_DTYPES = {
-    'float32': torch.float,
-    'float64': torch.float64
-}
-if isinstance(prms['dtype'], str):
-    prms['dtype'] = TORCH_DTYPES[prms['dtype']]
 torch.set_default_dtype(prms['dtype'])
-
 utils.set_seed(prms['seed'])
 
 #########################################################################################
@@ -141,10 +147,10 @@ test_t_k = utils_data.read_t_k(prms['data_dir'], test_filename)
 num_train_data = train_y_n_noisy.shape[0]
 num_test_data = test_y_n_noisy.shape[0]
 
-if train_y_n is not None:
+if train_y_n is None:
     train_y_n = torch.empty(num_train_data)
 
-if test_y_n is not None:
+if test_y_n is None:
     test_y_n = torch.empty(num_test_data)
 
 print("Training Data / Test Data: ", num_train_data, num_test_data)
@@ -179,7 +185,7 @@ test_set = TensorDataset(torch.Tensor(test_y_n_noisy).type(prms['dtype']).cuda(p
                          torch.Tensor(test_y_n).type(prms['dtype']).cuda(prms['device']),
                          torch.Tensor(test_t_k).type(prms['dtype']).cuda(prms['device']))
 
-training_data_loader = DataLoader(train_set, batch_size=prms['batch_size'], shuffle=True)
+training_data_loader = DataLoader(train_set, batch_size=prms['batch_size'], shuffle=True, drop_last=prms['drop_last'])
 testing_data_loader = DataLoader(test_set, batch_size=prms['testbatch_size'], shuffle=False)
 
 print('===> Building model')
@@ -209,11 +215,11 @@ print('Learning Rate: ', lr_scheduler.get_last_lr())
 for epoch in range(startEpoch + 1, prms['num_epochs'] + 1):
     if prms['model_decoder']:
         if prms['model_decoder'] == 'decoderReLUNet':
-            tmp = [phis.plot_phi_ReLU(model.state_dict()['decoder.c_ReLU_plot.{:d}'.format(i)].detach().cpu(),
+            tmp = [phis.plot_phi_ReLU(model.state_dict()['decoder.c_ReLU.{:d}'.format(i)].detach().cpu(),
                                model.state_dict()['decoder.shift.{:d}'.format(i)].detach().cpu(),
                                model.state_dict()['decoder.init.{:d}'.format(i)].detach().cpu(), prms['resolution'], prms['T']) for i in range(len(prms['K']))]
         elif prms['model_decoder'] == 'decoderTriNet':
-            tmp = [phis.plot_phi_tri(model.state_dict()['decoder.c_tri_plot.{:d}'.format(i)].detach().cpu(),
+            tmp = [phis.plot_phi_tri(model.state_dict()['decoder.c_tri.{:d}'.format(i)].detach().cpu(),
                                model.state_dict()['decoder.shift.{:d}'.format(i)].detach().cpu(), prms['resolution'], prms['T']) for i in range(len(prms['K']))]
 
         t_phi, phi = list(zip(*tmp))

@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import copy
 import phis
 import utils_model
 
@@ -145,9 +144,6 @@ class decoderReLUNet(nn.Module):
                 # Randomly initialise the coefficients if no phi specified
                 torch.nn.init.uniform_(self.c_ReLU[i], a=-0.01, b=0.01)
 
-        self.c_ReLU_plot = copy.deepcopy(self.c_ReLU)
-        self.c_ReLU_plot.requires_grad_(False)
-
         layersList=[nn.Linear(prms['K_total'], self.knots_tot),
             nn.ReLU(True),
             ]
@@ -184,7 +180,7 @@ class decoderReLUNet(nn.Module):
         # Layer 3 (phi(x) = c_i*ReLU(x-i))
         lst = []
         lst_bias = []
-        for i, j, k, pl in zip(self.c_ReLU, self.init, self.K, self.c_ReLU_plot):
+        for i, j, k in zip(self.c_ReLU, self.init, self.K):
             if self.train_decoder:
                 # i = i.clone()
                 if self.norm_phi:
@@ -195,7 +191,6 @@ class decoderReLUNet(nn.Module):
                 i.data[-1] = -torch.sum(i[:-1])
             lst.extend([i] * k)
             lst_bias.extend([j] * k)
-            pl.data = i
 
         layer3weight = torch.block_diag(*lst).float().to(t_k_hat.device)
         layer3bias = torch.Tensor(lst_bias).float().to(t_k_hat.device)
@@ -250,9 +245,6 @@ class decoderTriNet(nn.Module):
             for param in self.c_tri:
                 torch.nn.init.uniform_(param, a=0, b=1/self.T_int)
 
-        self.c_tri_plot = copy.deepcopy(self.c_tri)
-        self.c_tri_plot.requires_grad_(False)
-
         layersList=[nn.Linear(self.K, self.knots_tot),
             nn.ReLU(True),
             nn.Conv1d(self.N, self.N, 3, groups=self.N, bias=False)
@@ -291,14 +283,11 @@ class decoderTriNet(nn.Module):
 
         # Layer 3 (ReLU(x) --> , phi(x) = c_i*triangle(x-i))
         lst = []
-        for i, k, pl in zip(self.c_tri, self.K, self.c_tri_plot):
+        for i, k in zip(self.c_tri, self.K):
             if self.train_decoder:
-                # print(i.data)
-                # i = (i + torch.cat((i[1:], torch.zeros(1, device=self.device))))/2
                 if self.norm_phi:
                     i = i / (computePeakPhi(i, resolution=self.resolution, model_decoder="tri") * self.T_int)
             lst.extend([i] * k)
-            pl.data = i
 
         layer3weight = torch.block_diag(*lst).to(self.device).type(self.dtype)
 

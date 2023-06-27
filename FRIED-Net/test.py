@@ -57,11 +57,11 @@ for i, file in enumerate(args.data_filename):
     else:
         model.eval()
 
-    # Set output file name to be the same as the data
     if args.output_filename:
         output_file = args.output_filename
     else:
-        output_file = file.replace(".h5", ".mat")
+        output_file = file.replace(".h5", ".mat")     # Set output file name to be the same as the data
+
     output_path = pjoin(args.output_dir, output_file)
     print('Output: ', output_path)
 

@@ -163,3 +163,6 @@ cython_debug/
 /FRIED-Net/results/
 /dataset/
 /FRIED-Net/pretrained_models_original/
+/DeepUnfoldedPWGD/pretrained_models_original/
+/DeepUnfoldedPWGD/test/
+/DeepUnfoldedPWGD/results/
