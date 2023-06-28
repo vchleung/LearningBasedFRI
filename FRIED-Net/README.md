@@ -6,7 +6,7 @@ An encoder-decoder network inspired by modelling the acquisition process of FRI 
 </p>
 
 ## Data
-Data is in `.h5` format and must at least contain the noisy samples as `y_n_noisy` and the ground truth locations `t_k`. 
+Data is in `.h5` format and must at least contain the noisy samples as `y_n_noisy` and the ground truth locations `t_k`. Please read [`datasets`](../datasets) for more details. 
 
 ## Training
 First, start the ``visdom.server`` for visualisation during training.
@@ -42,8 +42,8 @@ Finally, when you want to initialise from the learned encoder and learned decode
 ```shell
 python main.py \
     --output_dir path/to/output/ --data_dir path/to/data/ --N 21 --K 2 \
-    --model_encoder conv --encoder_init_path path/to/directInferenceModel.pth --train_encoder \
-    --model_decoder decoderReLUNet --decoder_init_path path/to/learnedPhiModel.pth --train_decoder --norm_phi \
+    --model_encoder conv --encoder_init_path path/to/learnedEncoder.pth --train_encoder \
+    --model_decoder decoderReLUNet --decoder_init_path path/to/learnedDecoder.pth --train_decoder --norm_phi \
     --loss_fn ynnoisyMSE+tkMSE --loss_prms 100.
 ```
 There are also other different settings to be played with. For example, to apply FRIED-Net to Calcium imaging data (non-periodic signal), arguments `--no-periodic` and `--samp_mode causal` has to be set. Please refer to the description of the arguments in the code for a more detailed explanation to each parameter.
@@ -52,9 +52,8 @@ There are also other different settings to be played with. For example, to apply
 To test the trained model, run [`test.py`](test.py):
 ```shell
 python test.py \
-    --data_dir path/to/data/ \
-    --data_filename filenames \
+    --data_dir path/to/data/ --data_filename filenames \
     --output_dir path/to/output/ \
-    --model_path path/to/model_last.pth
+    --model_path path/to/learnedmodel.pth
 ```
 To fine-tune the learned encoder using backpropagation of mean squared samples error, set the flag `--fine_tune` and `--batch_size 1`. It is also possible to evaluate multiple datafiles using a single model or evaluate multiple datafile with a specified model for each of them by passing `--data_filename` or `--model_path` a list. For testing on calcium imaging data, set the flag `--load_cai-mat` and point `--data_filename` to the raw cai-1 recording. 
