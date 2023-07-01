@@ -13,8 +13,8 @@ Some examples of the exact synthetic data used in the paper can be found [here](
 The pretrained models can be found in [`FRIED-Net/pretrained_models/synthetic_data`](../FRIED-Net/pretrained_models/synthetic_data) and [`DeepUnfoldedPWGD/pretrained_models/synthetic_data`](../DeepUnfoldedPWGD/pretrained_models/synthetic_data).
 
 ## Calcium Imaging Dataset (cai-1)
-Another application of our proposed FRIED-Net is on detecting spikes from calcium imaging recordings. 
+Another application of our proposed FRIED-Net is on detecting spikes from calcium imaging recordings. In the paper, we have used the GCaMP6f data from the cai-1 dataset described in Chen, et al Nature 2013.
 
-Under [`cai-1`](cai-1), we have provided the MATLAB code [`convert_data_cai.m`](cai-1/convert_data_cai.m) to convert the cai-1 dataset into the FRI settings used by FRIED-Net, as well as plotting the reconstruction results. Please first download the original cai-1 dataset [here](https://crcns.org/data-sets/methods/cai-1) before running the code. 
+Under [`cai-1`](cai-1), we have provided the MATLAB code [`convert_data_cai.m`](cai-1/convert_data_cai.m) to convert the GCaMP6f calcium imaging recordings into the FRI settings used by FRIED-Net, as well as plotting the reconstruction results. Please first download the original GCaMP6f recordings from cai-1 dataset [here](https://crcns.org/data-sets/methods/cai-1) before running the code.
 
 In addition, we have provided the code for running fast deconvolution based on [PyFNND](https://github.com/alimuldal/PyFNND) for performance comparison. Our pretrained FRIED-Net models can be found in [`FRIED-Net/pretrained_models/cai-1`](../FRIED-Net/pretrained_models/cai-1).

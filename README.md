@@ -1,5 +1,7 @@
-# [Learning-based Reconstruction of FRI Signals](https://arxiv.org/abs/2212.08758)
-This repository is contains the code and pretrained models for "Learning-based reconstruction of FRI signals" by [Vincent C. H. Leung](https://www.imperial.ac.uk/people/chi.leung14) ([chi.leung14@imperial.ac.uk](mailto:chi.leung14@imperial.ac.uk)), [Jun-Jie Huang](https://jjhuangcs.github.io/), [Yonina C. Eldar](https://www.weizmann.ac.il/math/yonina/) and [Pier Luigi Dragotti](https://www.commsp.ee.ic.ac.uk/~pld/). 
+# [Learning-based Reconstruction of FRI Signals](https://ieeexplore.ieee.org/document/10169093)
+[Vincent C. H. Leung](https://www.imperial.ac.uk/people/chi.leung14) ([chi.leung14@imperial.ac.uk](mailto:chi.leung14@imperial.ac.uk)), [Jun-Jie Huang](https://jjhuangcs.github.io/), [Yonina C. Eldar](https://www.weizmann.ac.il/math/yonina/) and [Pier Luigi Dragotti](https://www.commsp.ee.ic.ac.uk/~pld/)
+
+This repository is contains the code and pretrained models for "Learning-based reconstruction of FRI signals" _([TSP' 23](https://ieeexplore.ieee.org/document/10169093); [arxiv](https://arxiv.org/abs/2212.08758))_. 
 
 The code consists of two different learning-based FRI models: Deep Unfolded Projected Wirtinger Gradient Descent (Deep Unfolded PWGD) and FRI Encoder-Decoder Network (FRIED-Net). Deep Unfolded PWGD operates in the frequency domain and unfolds the iterative denoising process, while FRIED-Net models the FRI acquisition process and the fact that FRI signals are determined by a small number of parameters to form an autoencoder-like network architecture. 
 
@@ -23,14 +25,14 @@ Two types of data are used in the paper: synthetic and calcium imaging (cai-1) d
 If you find this repository, please cite the following paper:
 
 >V. C. H. Leung, J.-J. Huang, Y. C. Eldar and P. L. Dragotti. '[Learning-based
-reconstruction of FRI signals](https://arxiv.org/abs/2212.08758),' Accepted to IEEE Transactions on Signal Processing, 2023.
+reconstruction of FRI signals](https://ieeexplore.ieee.org/document/10169093),' IEEE Transactions on Signal Processing, 2023.
 
 ```bibtex
-@online{Leung2022,
-  title = {Learning-based Reconstruction of {{FRI}} Signals},
-  author = {Leung, Vincent C H and Huang, Jun-Jie and Eldar, Yonina C and Dragotti, Pier Luigi},
+@article{Leung2023,
+  title = {Learning-Based Reconstruction of {{FRI}} Signals},
+  author = {Leung, Vincent C. H. and Huang, Jun-Jie and Eldar, Yonina C. and Dragotti, Pier Luigi},
   date = {2023},
-  pubstate = {Accepted to IEEE Transactions on Signal Processing},
+  journaltitle = {IEEE Transactions on Signal Processing},
   doi = {10.1109/TSP.2023.3290355}
 }
 ```
