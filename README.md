@@ -26,15 +26,18 @@ Two types of data are used in the paper: synthetic and calcium imaging (cai-1) d
 ## Reference
 If you find this repository, please cite the following paper:
 
->V. C. H. Leung, J.-J. Huang, Y. C. Eldar and P. L. Dragotti. '[Learning-Based
-Reconstruction of FRI signals](https://ieeexplore.ieee.org/document/10169093),' IEEE Transactions on Signal Processing, 2023.
+>V. C. H. Leung, J.-J. Huang, Y. C. Eldar and P. L. Dragotti. "[Learning-Based
+Reconstruction of FRI signals](https://ieeexplore.ieee.org/document/10169093)," IEEE Transactions on Signal Processing, vol. 71, pp. 2564-2578, 2023.
 
 ```bibtex
 @article{Leung2023,
   title = {Learning-Based Reconstruction of {{FRI}} Signals},
   author = {Leung, Vincent C. H. and Huang, Jun-Jie and Eldar, Yonina C. and Dragotti, Pier Luigi},
   date = {2023},
-  journaltitle = {IEEE Transactions on Signal Processing},
+  journal={IEEE Transactions on Signal Processing},
+  volume={71},
+  number={},
+  pages={2564--2578},
   doi = {10.1109/TSP.2023.3290355}
 }
 ```
